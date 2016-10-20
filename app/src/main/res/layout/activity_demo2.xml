@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:jijc="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="com.jijc.viewdemo.activity.Demo2Activity">
+
+    <com.jijc.viewdemo.view.MImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        jijc:imageSrc="@mipmap/e_060"
+        jijc:scaleType="center"
+        jijc:text="测试文字的长度应该可以长点"
+        jijc:textColor="@color/colorAccent"
+        jijc:textSize="16dp"/>
+
+    <com.jijc.viewdemo.view.MImageView
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        jijc:imageSrc="@mipmap/e_060"
+        jijc:scaleType="center"
+        jijc:text="测试文字的长度应该可以长点"
+        jijc:textColor="@color/colorPrimary"
+        jijc:textSize="18dp"/>
+
+    <com.jijc.viewdemo.view.MImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        jijc:imageSrc="@mipmap/icon_identity_card"
+        jijc:scaleType="center"
+        jijc:text="妹子"
+        jijc:textColor="@color/colorAccent"
+        jijc:textSize="15dp"/>
+
+</LinearLayout>

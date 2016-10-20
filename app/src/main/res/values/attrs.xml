@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--公共属性-->
+    <attr name="textColor" format="color"/>
+    <attr name="textSize" format="dimension"/>
+
+    <!--自定义MTextView的属性-->
+    <declare-styleable name="MTextView">
+        <attr name="mText" format="string"/>
+        <attr name="mTextColor" format="color"/>
+        <attr name="mTextSize" format="dimension"/>
+    </declare-styleable>
+
+    <!--自定义MImageView的属性-->
+    <declare-styleable name="MImageView">
+        <attr name="text" format="string"/>
+        <attr name="textColor"/>
+        <attr name="textSize"/>
+        <attr name="imageSrc" format="reference"/>
+        <attr name="scaleType" format="enum">
+            <enum name="fillXY" value="0" />
+            <enum name="center" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <!--自定义MCycleView的属性-->
+    <declare-styleable name="MCycleView">
+        <attr name="firstColor" format="color"/>
+        <attr name="secondColor" format="color"/>
+        <attr name="textColor"/>
+        <attr name="cycleWidth" format="dimension"/>
+        <attr name="textSize"/>
+        <attr name="speed" format="integer"/>
+        <attr name="progress" format="integer"/>
+        <attr name="textStrokeWidth" format="dimension"/>
+        <attr name="cycleStrokeWidth" format="dimension"/>
+        <attr name="style" format="enum">
+            <enum name="fill" value="0" />
+            <enum name="stroke" value="1" />
+            <enum name="fill_stroke" value="2" />
+        </attr>
+    </declare-styleable>
+</resources>

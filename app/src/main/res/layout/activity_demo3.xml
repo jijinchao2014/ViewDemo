@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:jijc="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    tools:context="com.jijc.viewdemo.activity.Demo3Activity">
+
+    <com.jijc.viewdemo.view.MCycleView
+        android:layout_marginTop="5dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        jijc:cycleStrokeWidth="15dp"
+        jijc:cycleWidth="15dp"
+        jijc:firstColor="@color/colorAccent"
+        jijc:progress="88"
+        jijc:secondColor="@color/colorPrimary"
+        jijc:speed="8"
+        jijc:style="stroke"
+        jijc:textColor="@android:color/holo_orange_dark"
+        jijc:textSize="32dp"
+        jijc:textStrokeWidth="1dp"/>
+
+    <com.jijc.viewdemo.view.MCycleView
+        android:layout_marginTop="5dp"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        jijc:cycleStrokeWidth="20dp"
+        jijc:cycleWidth="10dp"
+        jijc:firstColor="@android:color/holo_orange_dark"
+        jijc:progress="67"
+        jijc:secondColor="@android:color/holo_purple"
+        jijc:speed="15"
+        jijc:style="fill_stroke"
+        jijc:textColor="@android:color/holo_green_dark"
+        jijc:textSize="40dp"
+        jijc:textStrokeWidth="1dp"/>
+
+    <com.jijc.viewdemo.view.MCycleView
+        android:layout_marginTop="5dp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        jijc:cycleStrokeWidth="30dp"
+        jijc:cycleWidth="15dp"
+        jijc:firstColor="@android:color/holo_green_dark"
+        jijc:progress="33"
+        jijc:secondColor="@color/colorAccent"
+        jijc:speed="15"
+        jijc:style="fill"
+        jijc:textColor="@android:color/holo_purple"
+        jijc:textSize="40dp"
+        jijc:textStrokeWidth="1dp"/>
+
+
+</LinearLayout>

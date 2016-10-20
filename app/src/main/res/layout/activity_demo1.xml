@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:jijc="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.Demo1Activity">
+
+    <EditText
+        android:hint="查询测试"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <com.jijc.viewdemo.view.MTextView
+        android:id="@+id/tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        jijc:mTextColor="@color/colorPrimary"
+        jijc:mTextSize="30dp"
+        android:padding="10dp"
+        android:layout_centerInParent="true"
+        jijc:mText="点我有惊喜"/>
+</RelativeLayout>
