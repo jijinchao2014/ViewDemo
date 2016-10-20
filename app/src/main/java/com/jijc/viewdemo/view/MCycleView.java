@@ -143,7 +143,7 @@ public class MCycleView extends View {
             mPaint.setColor(secondColor);
             //绘制圆弧
             canvas.drawArc(oval,-90,mProgress,false,mPaint);
-            
+
             str =  (mProgress*100/360) + "";
             Rect  bounds = new Rect();
             textPaint.getTextBounds(str,0,str.length(),bounds);
