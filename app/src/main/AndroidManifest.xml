@@ -4,6 +4,7 @@
 
     <application
         android:allowBackup="true"
+        android:name=".BaseApp"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -20,6 +21,10 @@
         <activity android:name=".activity.Demo2Activity">
         </activity>
         <activity android:name=".activity.Demo3Activity">
+        </activity>
+        <activity android:name=".activity.Demo4Activity">
+        </activity>
+        <activity android:name=".activity.Demo5Activity">
         </activity>
     </application>
 

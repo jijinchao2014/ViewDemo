@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.jijc.viewdemo.R;
 import com.jijc.viewdemo.utils.CheckPackageUtils;
 import com.jijc.viewdemo.utils.VoiceConnectUtils;
@@ -20,6 +21,10 @@ public class Demo1Activity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo1);
         MTextView tv = (MTextView) findViewById(R.id.tv);
+
+        String str="{'data':[{'compTime':'17:17','jdr':'导购1','method':'2','suegue':'2'},{'compTime':'22:17','jdr':'导购2','method':'2','suegue':'2'},{'compTime':'3:17','jdr':'导购3','method':'2','suegue':'2'}]}";
+        Gson gson = new Gson();
+        TestBean testBean = gson.fromJson(str, TestBean.class);
 
         tv.setOnClickListener(this);
         new Thread(new Runnable() {
