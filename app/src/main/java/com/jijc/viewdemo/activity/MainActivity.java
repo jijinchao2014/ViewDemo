@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         functions.add("Android 自定义View (三) 圆环交替 等待效果 ");
         functions.add("Android 自定义View (四) 标签 ");
         functions.add("Android 自定义View (五) 标签 ");
+        functions.add("Android 自定义View (六) 进度条 ");
     }
 
     private void initView() {
@@ -64,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 4:
                 startActivity(new Intent(mContext,Demo5Activity.class));
+                break;
+            case 5:
+                startActivity(new Intent(mContext,Demo6Activity.class));
                 break;
         }
     }
