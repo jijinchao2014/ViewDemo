@@ -35,15 +35,18 @@ public class Demo7Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mContext = this;
         setContentView(R.layout.activity_demo7);
-        imgList.add("http://ad5.bbtree.com/ad-test/R4D5wwbpnfC_1482127068443.jpg");
-        imgList.add("http://ad5.bbtree.com/ad-test/vAV1qGjk5GB_1481875269227.png");
-        imgList.add("http://ad5.bbtree.com/ad-test/GBn8Yvuz2kG_1482286543893.jpg");
-        imgList.add("http://ad5.bbtree.com/ad-test/181KXS7wJRm_1482288039170.jpg");
+        imgList.add("http://img6.pplive.cn/2012/09/04/18174187070.jpg");
+        imgList.add("http://pic.58pic.com/58pic/13/05/48/98K58PICRJT_1024.jpg");
+        imgList.add("http://pic22.nipic.com/20120621/10381980_112950399193_2.jpg");
+        imgList.add("http://img6.pplive.cn/2012/09/04/16593329013.jpg");
+        imgList.add("http://img6.pplive.cn/2012/05/08/15004210091.jpg");
+        imgList.add("http://pic2.ooopic.com/12/11/23/11bOOOPIC21_1024.jpg");
         viewpager = (CycleViewPager) findViewById(R.id.viewpager);
         ll_point = (LinearLayout) findViewById(R.id.ll_point);
 //        viewpager.addPoints(mContext,R.drawable.bg_pointer,ll_point,ListUtils.getSize(imgList));
+
         viewpager.addPoints(mContext,R.drawable.bg_pointer1,ll_point,ListUtils.getSize(imgList));
-        viewpager.setImages(mContext,imgList,R.layout.item_cycle_pager,new CycleViewPager.OnItemInitLisenter() {
+        viewpager.setImages(mContext,imgList,R.layout.item_cycle_pager,3000,new CycleViewPager.OnItemInitLisenter() {
             @Override
             public void initItemView(View view, int position) {
 
@@ -67,9 +70,9 @@ public class Demo7Activity extends AppCompatActivity {
             public void onItemVisible(int position) {
                 Log.w("jijinchao","onItemVisible:postion------------"+position);
             }
-        });
+        },7);
 
-        viewpager.startRoll(3000);
+//        viewpager.startRoll(3000);
 
     }
 

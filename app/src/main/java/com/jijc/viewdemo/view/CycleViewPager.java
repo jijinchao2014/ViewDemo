@@ -1,5 +1,9 @@
 package com.jijc.viewdemo.view;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.SystemClock;
 import android.support.v4.view.MotionEventCompat;
@@ -10,12 +14,15 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Scroller;
 
-import com.jijc.viewdemo.activity.Demo7Activity;
 import com.jijc.viewdemo.utils.UIUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,107 +32,55 @@ import java.util.TimerTask;
  * Created by jijc on 2016/12/21.
  * PackageName: com.jijc.viewdemo.view
  */
-public class CycleViewPager extends ViewPager {
+public class CycleViewPager<T> extends ViewPager {
     private LinearLayout ll_pointer;
-    private Timer timer;
+    private Timer mTimer;
     private Context mContext;
     private OnItemInitLisenter mOnItemInitLisenter;
+    private int mScrollDurationRatio;
+    private ScrollerCustomDuration mScroller = null;
     private float downX;
     private float downY;
     private long downTime;
     private long millisecond; //viewpager滚动间隔时间
     private boolean isRunnin;
+    private int lastPos;
+    private Animator pagerAnimation;
 
     public CycleViewPager(Context context) {
         super(context);
         mContext = context;
+        postInitViewPager();
     }
 
     public CycleViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        postInitViewPager();
     }
 
     /**
-     * 矫正adapter
-     *
-     * @param adapter
+     * 设置ViewPager动画的持续时间<br/>
+     * @param scrollFactor 滚动系数 0表示没有滚动效果，值越大滚动越慢
      */
-    @Override
-    public void setAdapter(PagerAdapter adapter) {
-        //假的监听 解决 cycleviewpager 不设置 OnPageChangeListener 时不修正 listener 的问题
-        addOnPageChangeListener(new SimpleOnPageChangeListener());
-        InnerPagerAdapter innerPagerAdapter = new InnerPagerAdapter(adapter);
-        super.setAdapter(innerPagerAdapter);
-        //添加首位后将viewpager定位到position=1的位置【ABCD】-->【DABCDA】
-        setCurrentItem(1, false);
-
-        /**
-         * viewpager 切换的动画 更多动画参考：https://github.com/jijinchao2014/ViewPagerAnimation
-         * 该库来源于AndroidMsky  对其表示感谢
-         */
-        setPageTransformer(true, new DepthPageTransformer());
-//        setPageTransformer(true, new ZoomOutPageTransformer());
-    }
-
-    /**
-     * 矫正listener
-     *
-     * @param listener
-     */
-    @Override
-    public void addOnPageChangeListener(OnPageChangeListener listener) {
-        InnerPageChangeListener innerPageChangeListener = new InnerPageChangeListener(listener);
-        super.addOnPageChangeListener(innerPageChangeListener);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        //防止多指误操作
-        int action = MotionEventCompat.getActionMasked(ev);
-        switch (action){
-            case MotionEvent.ACTION_DOWN:
-//                Log.w("jijinchao","action--------MotionEvent.ACTION_DOWN");
-                downX = ev.getX();
-                downY = ev.getY();
-                downTime = SystemClock.uptimeMillis();
-                stopRoll();
-                break;
-            case MotionEvent.ACTION_MOVE:
-//                Log.w("jijinchao","action--------MotionEvent.ACTION_MOVE");
-                break;
-            case MotionEvent.ACTION_UP:
-//                Log.w("jijinchao","action--------MotionEvent.ACTION_UP:"+getCurrentItem());
-                if (isRunnin){
-                    startRoll(millisecond);
-                }
-                float upX = ev.getX();
-                float upY = ev.getY();
-                long upTime = SystemClock.uptimeMillis();
-                if (Math.abs(upX-downX) < 15 && Math.abs(upY - downY) < 15 && upTime-downTime<500){
-                    if (mOnItemInitLisenter!=null){
-                        mOnItemInitLisenter.onItemClick(getCurrentItem()-1);
-                    }
-                }
-                break;
-            case MotionEvent.ACTION_CANCEL:
-//                Log.w("jijinchao","action--------MotionEvent.ACTION_CANCEL");
-                if (isRunnin){
-                    startRoll(millisecond);
-                }
-                break;
+    private void setScrollDurationFactor(double scrollFactor) {
+        if (mScroller != null) {
+            mScroller.setScrollDurationFactor(scrollFactor);
         }
-        return super.onTouchEvent(ev);
     }
 
     /**
-     * 设置图片和adapter
-     *
-     * @param imgList
-     * @param mContext
+     * CycleViewPager设置数据
+     * @param mContext 上下文
+     * @param imgList 图片集合
+     * @param layoutResId item的布局资源ID
+     * @param rollDuration 自动轮播间隔时间（单位：毫秒） 设置为0时不自动轮播
+     * @param lisenter item的监听
+     * @param scrollDurationRatio  viewpager自动切换的时间系数：0 表示无滚动效果，数值越大滚动越慢
      */
-    public void setImages(final Context mContext, final ArrayList<String> imgList, final int layoutResId, final OnItemInitLisenter lisenter) {
+    public void setImages(final Context mContext, final ArrayList<T> imgList, final int layoutResId, int rollDuration, final OnItemInitLisenter lisenter, int scrollDurationRatio) {
         this.mOnItemInitLisenter = lisenter;
+        this.mScrollDurationRatio = scrollDurationRatio;
         setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
@@ -153,17 +108,21 @@ public class CycleViewPager extends ViewPager {
                 container.removeView((View) object);
             }
         });
+
+        if (rollDuration > 0){
+            startRoll(rollDuration);
+        }
     }
 
     /**
      * 动态添加指示点
      *
      * @param mContext 上下文
-     * @param ll_point 放置指示点的布局
+     * @param ll_point 放置指示点的线性布局
      * @param drawable 指示点的样式 是一个selector，并且通过“state_enabled”来区分选中与非选中
-     * @param size 列表里的个数
+     * @param size     列表里的个数
      */
-    public void addPoints(Context mContext,int drawable, LinearLayout ll_point, int size) {
+    public void addPoints(Context mContext, int drawable, LinearLayout ll_point, int size) {
         ll_pointer = ll_point;
         //只有一张图片时不显示指示点
         if (size < 2) {
@@ -187,7 +146,134 @@ public class CycleViewPager extends ViewPager {
         }
     }
 
-    private int lastPos;
+    /**
+     * 开启自动轮播
+     *
+     * @param millisecond 轮播间隔
+     */
+    public void startRoll(long millisecond) {
+        this.millisecond = millisecond;
+        isRunnin = true;
+        //只有一张图片时不滚动
+        if (getAdapter().getCount() - 2 < 2) {
+            return;
+        }
+        mTimer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                ((Activity) mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setCurrentItem(getCurrentItem() + 1);
+                    }
+                });
+            }
+        };
+        mTimer.schedule(timerTask, millisecond, millisecond);
+    }
+
+    /**
+     * 轮播间隔
+     */
+    public void stopRoll() {
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
+        mTimer = null;
+    }
+
+    /**
+     * 矫正adapter
+     *
+     * @param adapter
+     */
+    @Override
+    public void setAdapter(PagerAdapter adapter) {
+        //假的监听 解决 cycleviewpager 不设置 OnPageChangeListener 时不修正 listener 的问题
+        addOnPageChangeListener(new SimpleOnPageChangeListener());
+        InnerPagerAdapter innerPagerAdapter = new InnerPagerAdapter(adapter);
+        super.setAdapter(innerPagerAdapter);
+        //添加首位后将viewpager定位到position=1的位置【ABCD】-->【DABCDA】
+        setCurrentItem(1, false);
+        //设置轮播动画的时间
+//        setScrollDurationFactor(0);
+
+        /**
+         * viewpager 切换的动画 更多动画参考：https://github.com/jijinchao2014/ViewPagerAnimation
+         * 该库来源于AndroidMsky  对其表示感谢
+         */
+        setPageTransformer(true, new DepthPageTransformer());
+//        setPageTransformer(true, new ZoomOutPageTransformer());
+    }
+
+    /**
+     * 矫正listener
+     *
+     * @param listener
+     */
+    @Override
+    public void addOnPageChangeListener(OnPageChangeListener listener) {
+        InnerPageChangeListener innerPageChangeListener = new InnerPageChangeListener(listener);
+        super.addOnPageChangeListener(innerPageChangeListener);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        //防止多指误操作
+        int action = MotionEventCompat.getActionMasked(ev);
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+//                Log.w("jijinchao","action--------MotionEvent.ACTION_DOWN");
+                downX = ev.getX();
+                downY = ev.getY();
+                downTime = SystemClock.uptimeMillis();
+                stopRoll();
+                break;
+            case MotionEvent.ACTION_MOVE:
+//                Log.w("jijinchao","action--------MotionEvent.ACTION_MOVE");
+                break;
+            case MotionEvent.ACTION_UP:
+                setScrollDurationFactor(2);
+//                Log.w("jijinchao","action--------MotionEvent.ACTION_UP:"+getCurrentItem());
+                if (isRunnin) {
+                    startRoll(millisecond);
+                }
+                float upX = ev.getX();
+                float upY = ev.getY();
+                long upTime = SystemClock.uptimeMillis();
+                if (Math.abs(upX - downX) < 15 && Math.abs(upY - downY) < 15 && upTime - downTime < 500) {
+                    if (mOnItemInitLisenter != null) {
+                        mOnItemInitLisenter.onItemClick(getCurrentItem() - 1);
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+//                Log.w("jijinchao","action--------MotionEvent.ACTION_CANCEL");
+                if (isRunnin) {
+                    startRoll(millisecond);
+                }
+                break;
+        }
+        return super.onTouchEvent(ev);
+    }
+
+    /**
+     * 通过反射找到ViewPager中控制滚动的属性
+     */
+    private void postInitViewPager() {
+        try {
+            Field scroller = ViewPager.class.getDeclaredField("mScroller");
+            scroller.setAccessible(true);
+            Field interpolator = ViewPager.class.getDeclaredField("sInterpolator");
+            interpolator.setAccessible(true);
+
+            mScroller = new ScrollerCustomDuration(getContext(),
+                    (Interpolator) interpolator.get(null));
+            scroller.set(this, mScroller);
+        } catch (Exception e) {
+        }
+    }
 
     /**
      * 修正listener
@@ -238,9 +324,10 @@ public class CycleViewPager extends ViewPager {
                 curChild.setEnabled(true);
             }
             lastPos = position - 1;
-            Log.w("jijinchao","postion******"+position);
-            if (mOnItemInitLisenter!=null){
-              mOnItemInitLisenter.onItemVisible(position-1);
+            Log.w("jijinchao", "postion******" + position);
+            if (mOnItemInitLisenter != null) {
+                setScrollDurationFactor(mScrollDurationRatio);
+                mOnItemInitLisenter.onItemVisible(position - 1);
             }
         }
 
@@ -299,10 +386,48 @@ public class CycleViewPager extends ViewPager {
         }
     }
 
+    /**
+     * 自定义Scroller 控制ViewPager切换动画的时间
+     */
+    public class ScrollerCustomDuration extends Scroller {
+
+        private double mScrollFactor = 1;
+
+        public ScrollerCustomDuration(Context context) {
+            super(context);
+        }
+
+        public ScrollerCustomDuration(Context context, Interpolator interpolator) {
+            super(context, interpolator);
+        }
+
+        @SuppressLint("NewApi")
+        public ScrollerCustomDuration(Context context, Interpolator interpolator, boolean flywheel) {
+            super(context, interpolator, flywheel);
+        }
+
+        /**
+         * Set the factor by which the duration will change
+         */
+        public void setScrollDurationFactor(double scrollFactor) {
+            mScrollFactor = scrollFactor;
+        }
+
+        @Override
+        public void startScroll(int startX, int startY, int dx, int dy, int duration) {
+            super.startScroll(startX, startY, dx, dy, (int) (duration * mScrollFactor));
+        }
+
+    }
+
+    /**
+     * 自定义接口，监听ViewPager的动作
+     */
     public interface OnItemInitLisenter {
         /**
          * 初始化CycleViewPager的item布局，将主动权交给开发者，开发者可以通过传入的布局资源初始化成view<br/>
          * 这个方法将完成加载的view返回给开发者，从而可以方便的设置ViewPager的item的图片文字等
+         *
          * @param view     通过传入的资源文件生成的view
          * @param position 当前的位置
          */
@@ -310,50 +435,16 @@ public class CycleViewPager extends ViewPager {
 
         /**
          * CycleViewPager的item点击事件
+         *
          * @param position
          */
         void onItemClick(int position);
 
         /**
          * viewpager条目可见时调用，处理广告的曝光建议在此回调中进行
+         *
          * @param position
          */
         void onItemVisible(int position);
-    }
-
-    /**
-     * 开启自动轮播
-     * @param millisecond 轮播间隔
-     */
-    public void startRoll(long millisecond) {
-        this.millisecond = millisecond;
-        isRunnin = true;
-        //只有一张图片时不滚动
-        if (getAdapter().getCount() - 2 < 2) {
-            return;
-        }
-        timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                ((Demo7Activity) mContext).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setCurrentItem(getCurrentItem() + 1);
-                    }
-                });
-            }
-        };
-        timer.schedule(timerTask, millisecond, millisecond);
-    }
-
-    /**
-     * 轮播间隔
-     */
-    public void stopRoll() {
-        if (timer != null) {
-            timer.cancel();
-        }
-        timer = null;
     }
 }

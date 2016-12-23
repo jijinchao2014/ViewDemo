@@ -8,7 +8,7 @@
     <com.jijc.viewdemo.view.CycleViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="135dp">
+        android:layout_height="wrap_content">
     </com.jijc.viewdemo.view.CycleViewPager>
     <LinearLayout
         android:visibility="gone"
