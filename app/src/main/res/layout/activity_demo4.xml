@@ -14,7 +14,7 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingTop="16.0dip"
-        f:horizontalSpacing="20dp"
+        f:horizontalSpacing="10dp"
         f:orientation="horizontal"
-        f:verticalSpacing="20dp" />
+        f:verticalSpacing="5dp" />
 </LinearLayout>

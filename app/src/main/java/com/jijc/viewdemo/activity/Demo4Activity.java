@@ -2,10 +2,12 @@ package com.jijc.viewdemo.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.jijc.viewdemo.R;
 import com.jijc.viewdemo.view.Tag;
 import com.jijc.viewdemo.view.TagListView;
+import com.jijc.viewdemo.view.TagView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,12 @@ public class Demo4Activity extends AppCompatActivity {
         mTagListView = (TagListView) findViewById(R.id.tagview);
         setUpData();
         mTagListView.setTags(mTags);
+        mTagListView.setOnTagClickListener(new TagListView.OnTagClickListener() {
+            @Override
+            public void onTagClick(TagView tagView, Tag tag) {
+                Toast.makeText(Demo4Activity.this, tag.getTitle(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setUpData() {
