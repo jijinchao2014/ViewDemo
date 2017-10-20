@@ -55,4 +55,28 @@
         <attr name="layout_horizontalSpacing" format="dimension"/>
         <attr name="layout_verticalSpacing" format="dimension"/>
     </declare-styleable>
+    <declare-styleable name="CircleProgressBar">
+        <attr name="back_color" format="color"/>
+        <attr name="inner_color" format="color"/>
+        <attr name="gradient_start" format="color"/>
+        <attr name="gradient_middle1" format="color"/>
+        <attr name="gradient_middle2" format="color"/>
+        <attr name="gradient_end" format="color"/>
+        <attr name="diameter" format="dimension"/>
+        <attr name="back_width" format="dimension"/>
+        <attr name="front_width" format="dimension"/>
+        <attr name="point_radius" format="dimension"/>
+        <attr name="is_need_title" format="boolean"/>
+        <attr name="is_need_content" format="boolean"/>
+        <attr name="is_need_unit" format="boolean"/>
+        <attr name="string_title" format="string"/>
+        <attr name="string_unit" format="string"/>
+        <attr name="current_value" format="float"/>
+        <attr name="max_value" format="float"/>
+        <attr name="progress_style" format="enum">
+            <enum name="progress" value="0"/>
+            <enum name="step"  value="1"/>
+            <enum name="speed" value="2"/>
+        </attr>
+    </declare-styleable>
 </resources>

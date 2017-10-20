@@ -81,7 +81,7 @@ public class MCycleView extends View {
 
         mPaint = new Paint();
 
-        handler.sendEmptyMessageDelayed(100,speed);
+        handler.sendEmptyMessageDelayed(10,speed);
 
 //        new Thread(new Runnable() {
 //            @Override
