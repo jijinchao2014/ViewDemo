@@ -20,14 +20,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Demo1Activity"></activity>
-        <activity android:name=".activity.Demo2Activity"></activity>
-        <activity android:name=".activity.Demo3Activity"></activity>
-        <activity android:name=".activity.Demo4Activity"></activity>
-        <activity android:name=".activity.Demo5Activity"></activity>
-        <activity android:name=".activity.Demo6Activity"></activity>
-        <activity android:name=".activity.Demo7Activity"></activity>
-        <activity android:name=".activity.Demo8Activity"></activity>
+        <activity android:name=".activity.Demo1Activity" />
+        <activity android:name=".activity.Demo2Activity" />
+        <activity android:name=".activity.Demo3Activity" />
+        <activity android:name=".activity.Demo4Activity" />
+        <activity android:name=".activity.Demo5Activity" />
+        <activity android:name=".activity.Demo6Activity" />
+        <activity android:name=".activity.Demo7Activity" />
+        <activity android:name=".activity.Demo8Activity" />
+        <activity android:name=".activity.Demo9Activity"></activity>
     </application>
 
 </manifest>

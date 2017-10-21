@@ -31,7 +31,7 @@ public class Demo8Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 bar1.setMaxValues(50);
-                bar1.setCurrentValues(11);
+                bar1.setCurrentValues(38);
             }
         });
 

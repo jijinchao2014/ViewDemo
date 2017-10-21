@@ -330,6 +330,7 @@ public class CircleProgressBar extends View {
         }
 
         invalidate();
+        canvas.save();
         canvas.restore();
     }
 
