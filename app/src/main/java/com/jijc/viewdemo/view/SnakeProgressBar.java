@@ -4,9 +4,11 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -19,6 +21,7 @@ public class SnakeProgressBar extends View {
     private static final int STATE_TOTAL = -1;
     private static final int STATE_CURRENT = 0;
     private static final int STAT_PASSED = 1;
+    private float PADDING_DP = dipToPx(15);
 
     private Paint mTotalLinesPaint;
     private Paint mTotalPointsPaint;
@@ -26,21 +29,24 @@ public class SnakeProgressBar extends View {
     private Paint mCurrentLinesPaint;
     private Paint mCurrentPointsPaint;
     private Paint mCurrentTextPaint;
+    private Paint mCurrentCirclePaint;
+    private Paint mCurrentRingPaint;
 
 
     private String mTotalLinesColor = "#e8e8e8";
     private String mCurrentLinesColor = "#92c659";
     private String mTotalTotalTextColor = "#111111";
     private String mCurrentTotalTextColor = "#ffffff";
-    private int mTotalStep = 6;
-    private int mCurrentStep = 3;
+    private int mTotalStep = 7;
+    private int mCurrentStep = 4;
     private int mMaxStep = 7; //每一行最大的步数
     private float centerX;
     private float centerY;
     private float mTotalLinesWidth = dipToPx(8);
     private float mTotalTotalTextSize = dipToPx(12);
-    private float mBigPointRadius = dipToPx(20);
-    private float mNormalPointRadius = dipToPx(15);
+    private float mBigPointRadius = dipToPx(18);
+    private float mNormalPointRadius = dipToPx(12);
+    private float mHorizontalSpace = dipToPx(60);
     private float mNormalLineSpace;
     private int[] data;
 
@@ -63,6 +69,7 @@ public class SnakeProgressBar extends View {
     }
 
     private void initView() {
+        PADDING_DP = mHorizontalSpace/2-mTotalLinesWidth;
         data = new int[mTotalStep];
         for (int i = 0;i < mTotalStep;i++){
             if (i < mCurrentStep-1){
@@ -73,13 +80,13 @@ public class SnakeProgressBar extends View {
                 data[i] = STATE_CURRENT;
             }
         }
-        centerX = mBigPointRadius;
+        centerX = mBigPointRadius+PADDING_DP;
         centerY = mBigPointRadius;
 
         if (mTotalStep <= mMaxStep){
-            mNormalLineSpace = (getScreenWidth()-dipToPx(30) - mBigPointRadius*2*2-mNormalPointRadius*2*(mTotalStep-2))/(mTotalStep-1);
+            mNormalLineSpace = (getScreenWidth()-PADDING_DP*2 - mBigPointRadius*2*2-mNormalPointRadius*2*(mTotalStep-2))/(mTotalStep-1);
         }else {
-
+            mNormalLineSpace = (getScreenWidth()-PADDING_DP*2 - mBigPointRadius*2*2-mNormalPointRadius*2*(mMaxStep-2))/(mMaxStep-1);
         }
 
         //总进度的线
@@ -99,6 +106,7 @@ public class SnakeProgressBar extends View {
 
         //显示总进度的文字
         mTotalTextPaint = new Paint();
+        mTotalTextPaint.setAntiAlias(true);
         mTotalTextPaint.setTextSize(mTotalTotalTextSize);
         mTotalTextPaint.setColor(Color.parseColor(mTotalTotalTextColor));
         mTotalTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -118,16 +126,41 @@ public class SnakeProgressBar extends View {
         mCurrentPointsPaint.setColor(Color.parseColor(mCurrentLinesColor));
         mCurrentPointsPaint.setStyle(Paint.Style.FILL);
 
+        //当前进度的外环
+        mCurrentRingPaint = new Paint();
+        mCurrentRingPaint.setAntiAlias(true);
+        mCurrentRingPaint.setDither(true);
+        mCurrentRingPaint.setColor(Color.parseColor(mCurrentLinesColor));
+        mCurrentRingPaint.setStyle(Paint.Style.STROKE);
+        mCurrentRingPaint.setStrokeWidth(dipToPx(10));
+
+        //当前进度的内环
+        mCurrentCirclePaint = new Paint();
+        mCurrentCirclePaint.setAntiAlias(true);
+        mCurrentCirclePaint.setDither(true);
+        mCurrentCirclePaint.setColor(Color.parseColor("#ffffff"));
+        mCurrentCirclePaint.setStyle(Paint.Style.STROKE);
+        mCurrentCirclePaint.setStrokeWidth(dipToPx(5));
+
         //显示当前进度的文字
         mCurrentTextPaint = new Paint();
+        mCurrentTextPaint.setAntiAlias(true);
         mCurrentTextPaint.setTextSize(mTotalTotalTextSize);
         mCurrentTextPaint.setColor(Color.parseColor(mCurrentTotalTextColor));
         mCurrentTextPaint.setTextAlign(Paint.Align.CENTER);
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int width = getScreenWidth();
+        //需要的行数
+        int lines = (int)Math.ceil((float)mTotalStep/mMaxStep);
+        int height= (int) ((lines-1)*mHorizontalSpace+mBigPointRadius*2);
+        setMeasuredDimension(width, height);
+    }
 
+    @Override
+    protected void onDraw(Canvas canvas) {
 
         for (int i=0; i<mTotalStep;i++){
             if (mTotalStep <= mMaxStep){ //小于设置的每行的最大数，平分屏幕
@@ -169,27 +202,165 @@ public class SnakeProgressBar extends View {
                         canvas.drawText((i+1)+"", startX-mNormalPointRadius,centerY+mTotalTotalTextSize / 3,mCurrentTextPaint);
                     }else {
                         canvas.drawLine(startX,centerY, stopX,centerY,mTotalLinesPaint);
+                        canvas.drawCircle(startX-mNormalPointRadius,centerY, mNormalPointRadius, mCurrentRingPaint);
+                        canvas.drawCircle(startX-mNormalPointRadius,centerY, mNormalPointRadius, mCurrentCirclePaint);
                         canvas.drawCircle(startX-mNormalPointRadius, centerY, mNormalPointRadius, mCurrentPointsPaint);
                         canvas.drawText((i+1)+"", startX-mNormalPointRadius,centerY+mTotalTotalTextSize / 3,mCurrentTextPaint);
                     }
                 }
             }else { //大于1行的情况
 
+                //当前第几行
+                int currentLine = (int)Math.ceil((float)(i+1)/mMaxStep);
+
+                float startX = centerX + mBigPointRadius + mNormalLineSpace * (i%mMaxStep) + (2 * (i%mMaxStep)) * mNormalPointRadius;
+                float stopX = startX+mNormalLineSpace;
+                Log.i("jijc","--------currentLine:"+currentLine%2);
+                if (currentLine%2 != 0){ //奇数行
+                    //奇数行是按照顺序的步骤画进度 并且右侧有转弯弧
+                    if (i == 0){
+                        if (STATE_TOTAL == data[i]){
+                            canvas.drawCircle(centerX, centerY, mBigPointRadius, mTotalPointsPaint);
+                            canvas.drawLine(centerX+mBigPointRadius,centerY, centerX+mBigPointRadius+mNormalLineSpace,centerY,mTotalLinesPaint);
+
+                        }else if (STAT_PASSED == data[i]){
+                            canvas.drawCircle(centerX, centerY, mBigPointRadius, mCurrentPointsPaint);
+                            canvas.drawLine(centerX+mBigPointRadius,centerY, centerX+mBigPointRadius+mNormalLineSpace,centerY,mCurrentLinesPaint);
+
+                        }else {
+                            canvas.drawLine(centerX+mBigPointRadius,centerY, centerX+mBigPointRadius+mNormalLineSpace,centerY,mTotalLinesPaint);
+                            canvas.drawCircle(centerX, centerY, mBigPointRadius, mCurrentPointsPaint);
+
+                        }
+                    }else if(i == mTotalStep-1){
+                        if (STATE_TOTAL == data[i]){
+                            canvas.drawCircle(startX+mBigPointRadius-2*mNormalPointRadius, centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mTotalPointsPaint);
+                        }else if (STAT_PASSED == data[i]){
+                            canvas.drawCircle(startX+mBigPointRadius-2*mNormalPointRadius, centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mCurrentPointsPaint);
+                        }else {
+                            canvas.drawCircle(startX+mBigPointRadius-2*mNormalPointRadius, centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mCurrentPointsPaint);
+
+                        }
+                    }else {
+                        RectF rightRect = new RectF();
+                        rightRect.left = startX-mNormalPointRadius-mHorizontalSpace/2;
+                        rightRect.top = centerY+mHorizontalSpace*(currentLine-1);
+                        rightRect.right = rightRect.left+mHorizontalSpace;
+                        rightRect.bottom = rightRect.top+mHorizontalSpace;
+                        if (STATE_TOTAL == data[i]){
+                            if((i+1)%mMaxStep != 0){
+                                canvas.drawLine(startX,centerY+mHorizontalSpace*(currentLine-1), stopX,centerY+mHorizontalSpace*(currentLine-1),mTotalLinesPaint);
+                            }else {
+                                canvas.drawArc(rightRect,-90,180,false,mTotalLinesPaint);
+                            }
+                            canvas.drawCircle(startX-mNormalPointRadius, centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mTotalPointsPaint);
+                            canvas.drawText((i+1)+"", startX-mNormalPointRadius,centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mTotalTextPaint);
+                        }else if (STAT_PASSED == data[i]){
+                            if((i+1)%mMaxStep != 0){
+                                canvas.drawLine(startX,centerY+mHorizontalSpace*(currentLine-1), stopX,centerY+mHorizontalSpace*(currentLine-1),mCurrentLinesPaint);
+                            }else {
+                                canvas.drawArc(rightRect,-90,180,false,mCurrentLinesPaint);
+                            }
+                            canvas.drawCircle(startX-mNormalPointRadius, centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentPointsPaint);
+                            canvas.drawText((i+1)+"", startX-mNormalPointRadius,centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mCurrentTextPaint);
+                        }else {
+                            if((i+1)%mMaxStep != 0){
+                                canvas.drawLine(startX,centerY+mHorizontalSpace*(currentLine-1), stopX,centerY+mHorizontalSpace*(currentLine-1),mTotalLinesPaint);
+                            }else {
+                                canvas.drawArc(rightRect,-90,180,false,mTotalLinesPaint);
+                            }
+                            canvas.drawCircle(startX-mNormalPointRadius,centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentRingPaint);
+                            canvas.drawCircle(startX-mNormalPointRadius,centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentCirclePaint);
+                            canvas.drawCircle(startX-mNormalPointRadius, centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentPointsPaint);
+                            canvas.drawText((i+1)+"", startX-mNormalPointRadius,centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mCurrentTextPaint);
+                        }
+                    }
+
+                }else { //偶数行
+
+                    //等差数列： an = a1+(n-1)*d
+                    //a1 = centerX+mBigPointRadius+(mMaxStep-1)*mNormalLineSpace + (2*mMaxStep-3)*mNormalPointRadius
+                    //d = -mNormalLineSpace-2*mNormalPointRadius
+                    //n = (i+1)%mMaxStep
+                    float cX = centerX+mBigPointRadius+(mMaxStep-1)*mNormalLineSpace + (2*mMaxStep-3)*mNormalPointRadius+((i+1)%mMaxStep-1)*(-mNormalLineSpace-2*mNormalPointRadius);
+
+                    if (i == 0){
+                        //不存在这种情况
+                    }else if(i == mTotalStep-1){
+                        if (STATE_TOTAL == data[i]){
+                            if ((i+1)%mMaxStep == 0){
+                                canvas.drawCircle(centerX, centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mTotalPointsPaint);
+                            }else {
+                                canvas.drawCircle(cX-(mBigPointRadius-mNormalPointRadius), centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mTotalPointsPaint);
+                            }
+                        }else if (STAT_PASSED == data[i]){
+                            if ((i+1)%mMaxStep == 0){
+                                canvas.drawCircle(centerX, centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mCurrentPointsPaint);
+                            }else {
+                                canvas.drawCircle(cX-(mBigPointRadius-mNormalPointRadius), centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mCurrentPointsPaint);
+                            }
+                        }else {
+                            if ((i+1)%mMaxStep == 0){
+                                canvas.drawCircle(centerX, centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mCurrentPointsPaint);
+                            }else {
+                                canvas.drawCircle(cX-(mBigPointRadius-mNormalPointRadius), centerY+mHorizontalSpace*(currentLine-1), mBigPointRadius, mCurrentPointsPaint);
+                            }
+
+                        }
+                    }else {
+                        RectF leftRect = new RectF();
+                        leftRect.right = centerX+(mBigPointRadius-mNormalPointRadius)+mHorizontalSpace/2;
+                        leftRect.left = leftRect.right-mHorizontalSpace;
+                        leftRect.top = centerY+mHorizontalSpace*(currentLine-1);
+                        leftRect.bottom = leftRect.top+mHorizontalSpace;
+                        if (STATE_TOTAL == data[i]){
+                            if ((i+1)%mMaxStep == 0){
+                                canvas.drawArc(leftRect,90,180,false,mTotalLinesPaint);
+                                canvas.drawCircle(centerX+(mBigPointRadius-mNormalPointRadius), centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mTotalPointsPaint);
+                                canvas.drawText((i+1)+"", centerX+(mBigPointRadius-mNormalPointRadius),centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mTotalTextPaint);
+
+                            }else {
+                                canvas.drawLine(cX-mNormalPointRadius,centerY+mHorizontalSpace*(currentLine-1), cX-mNormalPointRadius-mNormalLineSpace,centerY+mHorizontalSpace*(currentLine-1),mTotalLinesPaint);
+                                canvas.drawCircle(cX, centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mTotalPointsPaint);
+                                canvas.drawText((i+1)+"", cX,centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mTotalTextPaint);
+                            }
+
+                        }else if (STAT_PASSED == data[i]){
+                            if ((i+1)%mMaxStep == 0){
+                                canvas.drawArc(leftRect,90,180,false,mCurrentLinesPaint);
+                                canvas.drawCircle(centerX+(mBigPointRadius-mNormalPointRadius), centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentPointsPaint);
+                                canvas.drawText((i+1)+"", centerX+(mBigPointRadius-mNormalPointRadius),centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mCurrentTextPaint);
+                            }else {
+                                canvas.drawLine(cX-mNormalPointRadius,centerY+mHorizontalSpace*(currentLine-1), cX-mNormalPointRadius-mNormalLineSpace,centerY+mHorizontalSpace*(currentLine-1),mCurrentLinesPaint);
+                                canvas.drawCircle(cX, centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentPointsPaint);
+                                canvas.drawText((i+1)+"", cX,centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mCurrentTextPaint);
+                            }
+
+                        }else {
+
+                            if ((i+1)%mMaxStep == 0){
+                                canvas.drawArc(leftRect,90,180,false,mTotalLinesPaint);
+                                canvas.drawCircle(centerX+(mBigPointRadius-mNormalPointRadius),centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentRingPaint);
+                                canvas.drawCircle(centerX+(mBigPointRadius-mNormalPointRadius),centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentCirclePaint);
+                                canvas.drawCircle(centerX+(mBigPointRadius-mNormalPointRadius), centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentPointsPaint);
+                                canvas.drawText((i+1)+"", centerX+(mBigPointRadius-mNormalPointRadius),centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mCurrentTextPaint);
+
+                            }else {
+                                canvas.drawLine(cX-mNormalPointRadius,centerY+mHorizontalSpace*(currentLine-1), cX-mNormalPointRadius-mNormalLineSpace,centerY+mHorizontalSpace*(currentLine-1),mTotalLinesPaint);
+                                canvas.drawCircle(cX,centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentRingPaint);
+                                canvas.drawCircle(cX,centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentCirclePaint);
+                                canvas.drawCircle(cX, centerY+mHorizontalSpace*(currentLine-1), mNormalPointRadius, mCurrentPointsPaint);
+                                canvas.drawText((i+1)+"", cX,centerY+mHorizontalSpace*(currentLine-1)+mTotalTotalTextSize / 3,mCurrentTextPaint);
+
+                            }
+
+                        }
+                    }
+                }
             }
 
         }
 
-
-
-//        for (int i=0; i<mTotalStep-3;i++){
-//            float startX = centerX + mBigPointRadius + mNormalLineSpace * i + 2 * i * mNormalPointRadius;
-//            float stopX = centerX + mBigPointRadius + mNormalLineSpace * i + 2 * i * mNormalPointRadius + mNormalLineSpace;
-//            canvas.drawLine(startX,centerY, stopX,centerY,mCurrentLinesPaint);
-//            canvas.drawCircle(centerX + mBigPointRadius+mNormalLineSpace*(i+1)+(i*2+1)*mNormalPointRadius, centerY, mNormalPointRadius, mCurrentPointsPaint);
-//            canvas.drawText((i+2)+"",centerX + mBigPointRadius+mNormalLineSpace*(i+1)+(i*2+1)*mNormalPointRadius,centerY+ mTotalTotalTextSize / 3,mCurrentTextPaint);
-////            canvas.drawLine(startX,centerY, stopX,centerY,mTotalLinesPaint);
-//        }
-//        canvas.drawCircle(centerX, centerY, mBigPointRadius, mCurrentPointsPaint);
     }
     /**
      * dip 转换成px

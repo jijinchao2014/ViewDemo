@@ -79,4 +79,8 @@
             <enum name="speed" value="2"/>
         </attr>
     </declare-styleable>
+    <declare-styleable name="SnakeProgressBar">
+        <attr name="total_color" format="color"/>
+        <attr name="passed_color" format="color"/>
+    </declare-styleable>
 </resources>
