@@ -8,8 +8,21 @@
     tools:context="com.jijc.viewdemo.activity.Demo9Activity">
 
     <com.jijc.viewdemo.view.SnakeProgressBar
+        android:id="@+id/spb"
         android:layout_width="wrap_content"
         android:layout_marginTop="15dp"
+        app:horizontal_space ="60dp"
+        app:terminal_radius="18dp"
+        app:normal_radius="12dp"
+        app:total_line_color="#e8e8e8"
+        app:total_text_color="#111111"
+        app:passed_line_color="#92c659"
+        app:line_width="6dp"
+        app:text_size="12dp"
+        app:icon_start_off="@drawable/sun"
+        app:icon_end_off="@drawable/sun"
+        app:icon_start_on="@drawable/star"
+        app:icon_end_on="@drawable/star"
         android:layout_height="wrap_content" />
     <TextView
         android:layout_width="wrap_content"
