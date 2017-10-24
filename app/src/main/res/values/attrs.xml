@@ -98,4 +98,9 @@
         <attr name="icon_start_off" format="reference"/>
         <attr name="icon_end_off" format="reference"/>
     </declare-styleable>
+
+    <declare-styleable name="PileLayout">
+        <attr name="vertical_space" format="dimension"/>
+        <attr name="pile_width" format="dimension"/>
+    </declare-styleable>
 </resources>

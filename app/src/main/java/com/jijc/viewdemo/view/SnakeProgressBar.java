@@ -18,7 +18,8 @@ import android.view.WindowManager;
 import com.jijc.viewdemo.R;
 
 /**
- * Created by jijinchao on 2017/10/21.
+ * 蛇形进度条
+ * Created by JIJC on 2017/10/21.
  */
 
 public class SnakeProgressBar extends View {
