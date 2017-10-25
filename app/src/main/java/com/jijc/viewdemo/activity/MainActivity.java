@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         functions.add("Android 自定义View (六) 进度条 ");
         functions.add("Android 自定义View (七) 轮播图 ");
         functions.add("Android 自定义View (八) 圆形进度条 ");
-        functions.add("Android 自定义View (九) 蛇形进度条 ");
+        functions.add("Android 自定义View (九) 蛇形进度条(小圆) ");
         functions.add("Android 自定义View (十) 类似于点赞头像的layout ");
+        functions.add("Android 自定义View (11) 蛇形进度条(大圆) ");
     }
 
     private void initView() {
@@ -84,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 9:
                 startActivity(new Intent(mContext,Demo10Activity.class));
+                break;
+            case 10:
+                startActivity(new Intent(mContext,Demo11Activity.class));
                 break;
         }
     }

@@ -29,7 +29,8 @@
         <activity android:name=".activity.Demo7Activity" />
         <activity android:name=".activity.Demo8Activity" />
         <activity android:name=".activity.Demo9Activity" />
-        <activity android:name=".activity.Demo10Activity"></activity>
+        <activity android:name=".activity.Demo10Activity" />
+        <activity android:name=".activity.Demo11Activity"></activity>
     </application>
 
 </manifest>

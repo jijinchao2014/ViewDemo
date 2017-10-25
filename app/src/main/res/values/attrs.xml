@@ -85,11 +85,13 @@
         <attr name="passed_line_color" format="color"/>
         <attr name="passed_text_color" format="color"/>
         <attr name="current_circle_color" format="color"/>
+        <attr name="current_ring_color" format="color"/>
         <attr name="total_step" format="integer"/>
         <attr name="current_step" format="integer"/>
         <attr name="max_step" format="integer"/>
         <attr name="terminal_radius" format="dimension"/>
         <attr name="normal_radius" format="dimension"/>
+        <attr name="current_radius" format="dimension"/>
         <attr name="text_size" format="dimension"/>
         <attr name="line_width" format="dimension"/>
         <attr name="horizontal_space" format="dimension"/>
@@ -97,6 +99,7 @@
         <attr name="icon_end_on" format="reference"/>
         <attr name="icon_start_off" format="reference"/>
         <attr name="icon_end_off" format="reference"/>
+        <attr name="padding" format="dimension"/>
     </declare-styleable>
 
     <declare-styleable name="PileLayout">
