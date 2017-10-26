@@ -17,8 +17,8 @@ public class Demo9Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo9);
         spb = (SnakeProgressBar2) findViewById(R.id.spb);
-        spb.setTotalStep(21);
-        spb.setCurrentStep(13);
+        spb.setTotalStep(14);
+        spb.setCurrentStep(12);
         spb.setMaxStep(7);
     }
 }
