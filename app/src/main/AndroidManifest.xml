@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
     <application
         android:name=".BaseApp"
         android:allowBackup="true"
@@ -31,6 +34,7 @@
         <activity android:name=".activity.Demo9Activity" />
         <activity android:name=".activity.Demo10Activity" />
         <activity android:name=".activity.Demo11Activity"></activity>
+        <activity android:name=".activity.Demo12Activity"></activity>
     </application>
 
 </manifest>
