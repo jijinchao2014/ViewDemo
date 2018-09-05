@@ -84,6 +84,9 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
     }
 
     private boolean hasHeader(int position) {
+        if (!mAdapter.isHeaderShow()){
+            return false;
+        }
         if (position == 0) {
             return true;
         }
@@ -133,7 +136,7 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 
             final int adapterPos = parent.getChildAdapterPosition(child);
 
-            if (adapterPos != RecyclerView.NO_POSITION && (layoutPos == 0 || hasHeader(adapterPos))) {
+            if (adapterPos != RecyclerView.NO_POSITION && (layoutPos == 0 || hasHeader(adapterPos)) && mAdapter.isHeaderShow()) {
                 View header = getHeader(parent, adapterPos).itemView;
                 c.save();
                 final int left = child.getLeft();

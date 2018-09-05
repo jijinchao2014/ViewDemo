@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.Demo12Activity">
 
-    <EditText
-        android:id="@+id/mEtSearch"
+    <TextView
+        android:id="@+id/tv_single"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#c0c0bf"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/holo_red_dark"
-        android:textSize="14sp" />
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="选择联系人（单选）" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvContacts"
+    <TextView
+        android:id="@+id/tv_multi"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/mEtSearch"/>
-
-    <com.jijc.viewdemo.view.QuickIndexBar
-        android:id="@+id/qiBar"
-        android:layout_width="30dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/mEtSearch" />
-</RelativeLayout>
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="选择联系人（多选）" />
+</LinearLayout>

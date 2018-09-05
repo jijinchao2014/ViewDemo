@@ -28,6 +28,20 @@
         android:textColor="#999999"
         android:textSize="12sp" />
 
+    <CheckBox
+        android:id="@+id/cb_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:focusable="false"
+        android:clickable="false"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="30dp"
+        android:drawableRight="@drawable/choose_check_box_select"
+        android:background="@null"
+        android:visibility="gone"
+        android:button="@null"/>
+
     <View
         android:id="@+id/vw_divisition"
         android:layout_width="match_parent"

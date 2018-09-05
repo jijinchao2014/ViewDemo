@@ -8,6 +8,8 @@ import android.view.ViewGroup;
  */
 
 public interface StickyHeaderAdapter<T extends RecyclerView.ViewHolder> {
+    void setHeaderShow(boolean isHeaderShow);
+    boolean isHeaderShow();
     long getHeaderId(int position);
 
     T onCreateHeaderViewHolder(ViewGroup parent);

@@ -9,10 +9,12 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.jijc.viewdemo.R;
 import com.jijc.viewdemo.bean.ContactsBean;
+import com.jijc.viewdemo.utils.ListUtils;
 
 import java.util.ArrayList;
 
@@ -29,13 +31,24 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
     private final LayoutInflater mInflater;
     private char lastChar = '\u0000';
     private int DisplayIndex = 0;
+    private boolean isHeaderShow = true;
+    private boolean isSelectShow = false;
     SpannableStringBuilder textBuild = new SpannableStringBuilder();
 
     public PhoneContactAdapter(Context context, ArrayList<ContactsBean> contactLists) {
         this.context = context;
         mInflater = LayoutInflater.from(context);
         this.contactLists = contactLists;
-        blueSpan = new ForegroundColorSpan(Color.parseColor("#0094ff"));
+        blueSpan = new ForegroundColorSpan(Color.parseColor("#28d19d"));
+    }
+
+    public PhoneContactAdapter(Context context, ArrayList<ContactsBean> contactLists,boolean selectShow) {
+        this(context,contactLists);
+        isSelectShow = selectShow;
+    }
+
+    public ArrayList<ContactsBean> getData() {
+        return contactLists;
     }
 
     @Override
@@ -46,37 +59,49 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.setClickPosition(position);
         ContactsBean contactsBean = contactLists.get(position);
-        if (contactsBean.getMatchType() == 1) {//高亮名字
-            textBuild.clear();
-            textBuild.append(contactsBean.getName());
-            textBuild.setSpan(blueSpan, contactsBean.getHighlightedStart(), contactsBean.getHighlightedEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            holder.tvNumber.setText(contactsBean.getNumber());
-            holder.nickName.setText(textBuild);
-        } else if (contactsBean.getMatchType() == 2) {//高亮号码
-            textBuild.clear();
-            textBuild.append(contactsBean.getNumber());
-            textBuild.setSpan(blueSpan, contactsBean.getHighlightedStart(), contactsBean.getHighlightedEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            holder.tvNumber.setText(textBuild);
-            holder.nickName.setText(contactsBean.getName());
-        } else {//不高亮
-                holder.tvNumber.setText(contactsBean.getNumber());
-                holder.nickName.setText(contactsBean.getName() + "");
+        if (contactsBean != null){
+            if (contactsBean.matchType == 1) {//高亮名字
+                textBuild.clear();
+                textBuild.append(contactsBean.name);
+                textBuild.setSpan(blueSpan, contactsBean.highlightedStart, contactsBean.highlightedEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.tvNumber.setText(contactsBean.number);
+                holder.nickName.setText(textBuild);
+            } else if (contactsBean.matchType == 2) {//高亮号码
+                textBuild.clear();
+                textBuild.append(contactsBean.number);
+                textBuild.setSpan(blueSpan, contactsBean.highlightedStart, contactsBean.highlightedEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.tvNumber.setText(textBuild);
+                holder.nickName.setText(contactsBean.name);
+            } else {//不高亮
+                holder.tvNumber.setText(contactsBean.number);
+                holder.nickName.setText(contactsBean.name);
+            }
 
-        }
-
-
-        if (position == 0) {
-            holder.diviView.setVisibility(View.INVISIBLE);
-        } else {
-            ContactsBean currentItem = contactLists.get(position);
-            ContactsBean lastItem = contactLists.get(position - 1);
-            if (!currentItem.getPinyinFirst().equals(lastItem.getPinyinFirst())) {
-                holder.diviView.setVisibility(View.INVISIBLE);
-            } else {
+            if (isSelectShow){
+                holder.cb_contact.setVisibility(View.VISIBLE);
+                holder.cb_contact.setChecked(contactsBean.isSelected);
+            }else {
+                holder.cb_contact.setVisibility(View.GONE);
+            }
+            if (isHeaderShow){
+                if (position == 0) {
+                    holder.diviView.setVisibility(View.INVISIBLE);
+                } else {
+                    ContactsBean currentItem = contactLists.get(position);
+                    ContactsBean lastItem = contactLists.get(position - 1);
+                    if (!currentItem.pinyinFirst.equals(lastItem.pinyinFirst)) {
+                        holder.diviView.setVisibility(View.INVISIBLE);
+                    } else {
+                        holder.diviView.setVisibility(View.VISIBLE);
+                    }
+                }
+            }else {
                 holder.diviView.setVisibility(View.VISIBLE);
             }
         }
+
     }
 
     @Override
@@ -84,12 +109,26 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
         return contactLists.size();
     }
 
+    @Override
+    public void setHeaderShow(boolean isHeaderShow){
+        this.isHeaderShow = isHeaderShow;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean isHeaderShow(){
+        return isHeaderShow;
+    }
+
     //=================悬浮栏=================
     @Override
     public long getHeaderId(int position) {
+        if (!isHeaderShow){
+            return DisplayIndex;
+        }
         //这里面的是如果当前position与之前position重复（内部判断）  则不显示悬浮标题栏  如果不一样则显示标题栏
-        if (null != contactLists.get(position) && contactLists.get(position).getPinyinFirst().charAt(0) != '\0') {
-            char ch = contactLists.get(position).getPinyinFirst().charAt(0);
+        if (null != contactLists.get(position) && contactLists.get(position).pinyinFirst.charAt(0) != '\0') {
+            char ch = contactLists.get(position).pinyinFirst.charAt(0);
             if (lastChar == '\u0000') {
                 lastChar = ch;
                 return DisplayIndex;
@@ -116,16 +155,16 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
 
     @Override
     public void onBindHeaderViewHolder(HeaderHolder viewholder, int position) {
-        if (contactLists.get(position).getPinyinFirst().charAt(0) == '\0') {
+        if (contactLists.get(position).pinyinFirst.charAt(0) == '\0') {
             viewholder.header.setText("#");
         } else {
-            viewholder.header.setText(contactLists.get(position).getPinyinFirst() + "");
+            viewholder.header.setText(contactLists.get(position).pinyinFirst);
         }
     }
 
     public int getPositionForSection(char pinyinFirst) {
         for (int i = 0; i < getItemCount(); i++) {
-            char firstChar = contactLists.get(i).getPinyinFirst().charAt(0);
+            char firstChar = contactLists.get(i).pinyinFirst.charAt(0);
             if (firstChar == pinyinFirst) {
                 return i;
             }
@@ -134,17 +173,32 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
 
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final TextView nickName;
         private final TextView tvNumber;
+        private final CheckBox cb_contact;
         private final View diviView;
+        private int mPosition;
 
         public ViewHolder(View itemView) {
             super(itemView);
             nickName = (TextView) itemView.findViewById(R.id.tv_name);
             tvNumber = (TextView) itemView.findViewById(R.id.tv_number);
+            cb_contact = (CheckBox) itemView.findViewById(R.id.cb_contact);
             diviView = itemView.findViewById(R.id.vw_divisition);
+            itemView.setOnClickListener(this);
+        }
+
+        public void setClickPosition(int position){
+            this.mPosition = position;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mOnItemClickListener != null){
+                mOnItemClickListener.onItemClick(v,mPosition);
+            }
         }
     }
 
@@ -155,5 +209,15 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
             super(itemView);
             header = (TextView) itemView;
         }
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        mOnItemClickListener = onItemClickListener;
+    }
+
+    private OnItemClickListener mOnItemClickListener;
+
+    public interface OnItemClickListener{
+        void onItemClick(View v,int position);
     }
 }

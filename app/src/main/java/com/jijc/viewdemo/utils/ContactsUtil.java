@@ -39,20 +39,20 @@ public class ContactsUtil {
 //            //要获取所有的联系人,一个联系人会有多个号码
 //            getContactById(cr, contactId, name, searchContactLists);
             ContactsBean contact = new ContactsBean();
-            contact.setName(name);
-            contact.setContactId(contactId);
+            contact.name = name;
+            contact.contactId = contactId;
 //            String regEx = "[`~!@#$%^&*()\\-+={}':;,\\[\\].<>/?￥%…（）_+|【】‘；：”“’。，、？\\s]";
 //            Pattern p = Pattern.compile(regEx);
 //            Matcher m = p.matcher(number);
 //            number = m.replaceAll("").trim();
             number = number.replace("+86","").replace(" ","").trim();
-            if (!TextUtils.isEmpty(contact.getName())) {
+            if (!TextUtils.isEmpty(contact.name)) {
                 getPinyinList(contact);
             } else {
-                contact.setPinyinFirst("#");
+                contact.pinyinFirst = "#";
             }
 
-            contact.setNumber(number);
+            contact.number = number;
 
             if (RegexChk.isMobileExact(number)){
                 searchContactLists.add(contact);
@@ -70,17 +70,17 @@ public class ContactsUtil {
             Cursor phone = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=" + contactId, null, null);
             if (null != phone) {
                 ContactsBean contact = new ContactsBean();
-                contact.setName(name);
-                contact.setContactId(contactId);
+                contact.name = name;
+                contact.contactId = contactId;
 
-                if (!TextUtils.isEmpty(contact.getName())) {
+                if (!TextUtils.isEmpty(contact.name)) {
                     getPinyinList(contact);
                 } else {
-                    contact.setPinyinFirst("#");
+                    contact.pinyinFirst = "#";
                 }
                 while (phone.moveToNext()) {
                     String phoneNumber = phone.getString(phone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    contact.getNumberList().add(phoneNumber);
+                    contact.numberList.add(phoneNumber);
                 }
                 searchContactLists.add(contact);
             }
@@ -90,7 +90,7 @@ public class ContactsUtil {
     private static void getPinyinList(ContactsBean contactsBean) {
         StringBuffer bufferNamePiny = new StringBuffer();//NIHAO
         StringBuffer bufferNameMatch = new StringBuffer();//NH
-        String name = contactsBean.getName();
+        String name = contactsBean.name;
         for (int i = 0; i < name.length(); i++) {
             StringBuffer bufferNamePer = new StringBuffer();
             String namePer = name.charAt(i) + "";//名字的每个字
@@ -101,15 +101,15 @@ public class ContactsUtil {
                 bufferNameMatch.append(pinCh.charAt(0));
                 bufferNamePiny.append(pinCh);
             }
-            contactsBean.getNamePinyinList().add(bufferNamePer.toString());//单个名字集合
+            contactsBean.namePinyinList.add(bufferNamePer.toString());//单个名字集合
         }
-        contactsBean.setNamePinYin(bufferNamePiny.toString());
-        contactsBean.setMatchPin(bufferNameMatch.toString());
-        String firstPinyin = contactsBean.getNamePinYin().charAt(0) + "";
+        contactsBean.namePinYin = bufferNamePiny.toString();
+        contactsBean.matchPin = bufferNameMatch.toString();
+        String firstPinyin = contactsBean.namePinYin.charAt(0) + "";
         if (indexStr.contains(firstPinyin)) {
-            contactsBean.setPinyinFirst(firstPinyin);
+            contactsBean.pinyinFirst = firstPinyin;
         } else {
-            contactsBean.setPinyinFirst("#");
+            contactsBean.pinyinFirst = "#";
         }
     }
     public static String transformPinYin(String character) {
@@ -126,12 +126,12 @@ public class ContactsUtil {
         public int compare(Object o1, Object o2) {
             ContactsBean s1 = (ContactsBean) o1;
             ContactsBean s2 = (ContactsBean) o2;
-            if (s1.getPinyinFirst().equals("#")) {
+            if (s1.pinyinFirst.equals("#")) {
                 return 1;
-            } else if (s2.getPinyinFirst().equals("#")) {
+            } else if (s2.pinyinFirst.equals("#")) {
                 return -1;
             }
-            return s1.getPinyinFirst().compareTo(s2.getPinyinFirst());
+            return s1.pinyinFirst.compareTo(s2.pinyinFirst);
         }
     }
 
