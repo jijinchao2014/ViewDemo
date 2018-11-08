@@ -106,4 +106,12 @@
         <attr name="vertical_space" format="dimension"/>
         <attr name="pile_width" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="DiscreteScrollView">
+        <attr name="dsv_orientation" format="enum">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+        <attr name="is_first_center" format="boolean"/>
+    </declare-styleable>
 </resources>

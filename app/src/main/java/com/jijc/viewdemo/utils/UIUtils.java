@@ -4,10 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.jijc.viewdemo.BaseApp;
+
+import static android.content.Context.WINDOW_SERVICE;
 
 public class UIUtils {
 
@@ -86,6 +90,13 @@ public class UIUtils {
 	 */
 	public static Drawable getDrawable(int nothing) {
 		return getContext().getResources().getDrawable(nothing);
+	}
+
+	public static int getScreenWidth(Context context) {
+		WindowManager windowManager = (WindowManager)context.getSystemService(WINDOW_SERVICE);
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+		return displayMetrics.widthPixels;
 	}
 	/**
 	 * 通过id  获取string
